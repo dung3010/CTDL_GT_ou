@@ -1,0 +1,301 @@
+#include <iostream>
+
+using namespace std;
+
+
+// KHAI BAO CAU TRUC NODE DOUBLE LINK LIST
+struct Node {
+	int data;
+	Node* next, * prev;
+};
+
+
+// KHAI BAO CAU TRUC DOUBLE LINK LIST
+struct Double_ll {
+	Node* head, * tail;
+};
+
+
+// TAO DANH SACH RONG
+void init(Double_ll& ll) {
+	ll.head = NULL;
+	ll.tail = NULL;
+}
+
+
+// KIEM TRA DANH SACH RONG
+bool isEmpty(Double_ll ll) {
+	return ll.head == NULL;
+}
+
+// GIAI PHONG DANH SACH
+void freell(Double_ll& ll) {
+	while (ll.head != NULL)
+	{
+		Node* temp = ll.head;
+		ll.head = ll.head->next;
+		delete temp;
+	}
+	ll.head = NULL;
+	ll.tail = NULL;
+}
+
+
+// TAO NODE MOI
+Node* createNode(int val) {
+	Node* p = new Node;
+	p->data = val;
+	p->next = NULL;
+	p->prev = NULL;
+	return p;
+}
+
+
+//THEM NODE VAO DANH SACH
+void addFirst(Double_ll& ll, int& val) {
+	Node* p = createNode(val);
+	if (isEmpty(ll))
+	{
+		ll.head = ll.tail = p;
+	}
+	else
+	{
+		p->next = ll.head;
+		ll.head->prev = p;
+		ll.head = p;
+	}
+}
+
+void addLast(Double_ll& ll, int& val) {
+	Node* p = createNode(val);
+	if (isEmpty(ll))
+	{
+		ll.head = ll.tail = p;
+	}
+	else
+	{
+		p->prev = ll.tail;
+		ll.tail->next = p;
+		ll.tail = p;
+	}
+}
+
+
+void add(Double_ll& ll, int vt, int& val) {
+	Node* temp = ll.head;
+	while (temp != NULL && temp->data != vt)
+	{
+		temp = temp->next;
+	}
+	if (temp != NULL)
+	{
+		if (temp == ll.tail)
+		{
+			addLast(ll, val);
+		}
+		else
+		{
+			Node* p = createNode(val);
+			p->next = temp->next;
+			temp->next->prev = p;
+			temp->next = p;
+			p->prev = temp;
+		}
+	}
+	else
+	{
+		cout << "Gia tri " << vt << "khong co trong danh sach.\n";
+	}
+}
+
+
+//NHAP DANH SACH
+void addDs(Double_ll& ll, int& n) {
+	cout << "Nhap so luong phan tu cua danh sach: ";
+	cin >> n;
+	for (int i = 0; i < n; i++)
+	{
+		int val;
+		cout << "Nhap gia tri cua phan tu thu " << i << ": ";
+		cin >> val;
+		addLast(ll, val);
+	}
+}
+
+
+// XUAT DANH SACH
+void xuatHeadToTail(Double_ll ll) {
+	Node* p = ll.head;
+	while (p != NULL)
+	{
+		cout << p->data << "\t";
+		p = p->next;
+	}
+	cout << endl;
+}
+
+void xuatTailToHead(Double_ll ll) {
+	Node* p = ll.tail;
+	while (p != NULL)
+	{
+		cout << p->data << "\t";
+		p = p->prev;
+	}
+	cout << endl;
+}
+
+// DEM SO LUONG PHAN TU CUA DANH SACH
+int countNode(Double_ll ll) {
+	int count = 0;
+	if (isEmpty(ll))
+	{
+		return 0;
+	}
+	else
+	{
+		Node* temp = ll.head;
+		while (temp != NULL)
+		{
+			temp = temp->next;
+			count++;
+		}
+	}
+	return count;
+}
+
+// NOI 2 DANH SACH LAI
+Double_ll merge(Double_ll& ll1, Double_ll ll2) {
+	if (isEmpty(ll1))
+	{
+		ll1.head = ll2.head;
+		ll1.tail = ll2.tail;
+	}
+	else if (!isEmpty(ll2))
+	{
+		ll1.tail->next = ll2.head;
+		ll2.head->prev = ll1.tail;
+		ll1.tail = ll2.tail;
+	}
+	/*else if (isEmpty(ll1) && isEmpty(ll2))
+	{
+		cout << "Ca 2 danh sach deu rong.\n";
+	}*/
+	return ll1;
+}
+
+void menu() {
+	Double_ll ll, ll1, ll2;
+	int n, val;
+	init(ll);
+	init(ll1);
+	init(ll2);
+
+	bool flag1 = false, flag2 = false;
+
+	int baitap;
+	bool check = true;
+	do
+	{
+		cout << "\n=============================BAITAP===============================\n\n";
+		cout << "1. Nhap va xuat danh sach 1.\n";
+		cout << "2. Nhap va xuat danh sach 2.\n";
+		cout << "3. Them phan tu vao cuoi danh sach 1.\n";
+		cout << "4. Them phan tu vao dau danh sach 1.\n";
+		cout << "5. Them phan tu vao vi tri sau 1 phan tu danh sach 1.\n";
+		cout << "6. Dem so phan tu trong danh sach 1.\n";
+		cout << "7. Noi 2 danh sach.\n";
+		cout << "8. Giai phong danh sach.\n";
+		cout << "Nhap bai tap muon lam(1-6) hoac nhap bat ki de thoat: ";
+		cin >> baitap;
+		cout << "\n==================================================================\n\n";
+		switch (baitap)
+		{
+		case 1:
+			freell(ll1);
+			addDs(ll1, n);
+			xuatHeadToTail(ll1);
+			flag1 = true;
+			break;
+		case 2:
+			freell(ll2);
+			addDs(ll2, n);
+			xuatHeadToTail(ll2);
+			flag2 = true;
+			break;
+		case 3:
+			if (flag1)
+			{
+				cout << "Nhap gia tri muon them vao danh sach 1: ";
+				cin >> val;
+				addLast(ll1, val);
+				xuatHeadToTail(ll1);
+			}
+			else
+			{
+				cout << "Ban phai nhap phan tu cho danh sach 1 truoc (bai 1).\n";
+			}
+			break;
+		case 4:
+			if (flag1)
+			{
+				cout << "Nhap gia tri muon them vao danh sach 1: ";
+				cin >> val;
+				addFirst(ll1, val);
+				xuatHeadToTail(ll1);
+			}
+			else
+			{
+				cout << "Ban phai nhap phan tu cho danh sach 1 truoc (bai 1).\n";
+			}
+			break;
+		case 5:
+			if (flag1)
+			{
+				int vt;
+				cout << "Nhap gia tri muon them vao danh sach 1: ";
+				cin >> val;
+				cout << "Nhap gia tri cua phan tu tai vi rti muon them vao: ";
+				cin >> vt;
+				add(ll1,vt, val);
+				xuatHeadToTail(ll1);
+			}
+			else
+			{
+				cout << "Ban phai nhap phan tu cho danh sach 1 truoc (bai 1).\n";
+			}
+			break;
+		case 6:
+			cout << "So luong phan tu trong danh sach 1 la: " << countNode(ll1) << endl;
+			break;
+		case 7:
+			if (flag1 || flag2)
+			{
+				ll1 = merge(ll1, ll2);
+				xuatHeadToTail(ll1);
+			}
+			break;
+		case 8:
+			if (flag1)
+			{
+				freell(ll1);
+				flag1 = false;
+			}
+			if (flag2)
+			{
+				freell(ll2);
+				flag1 = false;
+			}
+		default:
+			check = false;
+			break;
+		}
+	} while (check == true);
+}
+
+
+
+
+int main() {
+	menu();
+	return 0;
+}

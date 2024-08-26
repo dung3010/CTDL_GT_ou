@@ -1,0 +1,314 @@
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+struct Node {
+	int data;
+	Node* left;
+	Node* right;
+};
+
+void init(Node* &root) {
+	root = NULL;
+}
+
+void add(Node*& root, int val) {
+	if (root == NULL)
+	{
+		root = new Node;
+		root->data = val;
+		root->left = NULL;
+		root->right = NULL;
+	}
+	else
+	{
+		if (root->data == val)
+		{
+			return;
+		}
+		else if (root->data > val)
+		{
+			return add(root->left, val);
+		}
+		else
+		{
+			return add(root->right, val);
+		}
+	}
+}
+
+
+void inputFile(Node* &root) {
+	ifstream myFile;
+	int n, val;
+	myFile.open("Input.txt");
+	if (myFile.is_open())
+	{
+		myFile >> n;
+		for (int i = 0; i < n; i++)
+		{
+			myFile >> val;
+			myFile.ignore();
+			add(root, val);
+		}
+	}
+	myFile.close();
+}
+
+
+
+
+
+void LNR(Node* root) {
+	if (root != NULL)
+	{
+		LNR(root->left);
+		cout << root->data << "\t";
+		LNR(root->right);
+	}
+}
+
+
+
+//STACK
+
+#define MAX 50
+
+struct Stack {
+	Node* arr[MAX];
+	int head;
+};
+void initStack(Stack& treeStack) {
+	treeStack.head = -1;
+}
+
+void push(Stack& treeStack, Node* x) {
+	treeStack.arr[++treeStack.head] = x;
+}
+
+Node* pop(Stack& treeStack) {
+	return treeStack.arr[treeStack.head--];
+}
+
+bool isEmpty(Stack treeStack) {
+	return treeStack.head < 0;
+}
+
+Node* popLRN(Stack treeStack) {
+	return treeStack.arr[treeStack.head];
+}
+
+
+
+// DUYET LNR KHU DE QUY
+
+void LNRStack(Node* root, Stack &treeStack) {
+	if (root != NULL) {
+		Node* p = root;
+		while (true)
+		{
+			while (p != NULL)
+			{
+				push(treeStack, p);
+				p = p->left;
+			}
+
+			if (!isEmpty(treeStack))
+			{
+				Node* r = pop(treeStack);
+				cout << r->data << "\t";
+				if (r->right != NULL)
+				{
+					p = r->right;
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+}
+
+// DUYET NLR KHU DE QUY
+void LRNStack(Node* root, Stack& treeStack) {
+	if (root != NULL)
+	{
+		Node* p = root;
+		Node* visited = NULL;
+		while (true)
+		{
+			while (p != NULL)
+			{
+				push(treeStack, p);
+				p = p->left;
+			}
+			if (!isEmpty(treeStack))
+			{
+				Node* r = popLRN(treeStack);
+				if (r->right != NULL && r->right != visited) {
+					p = r->right;
+				}
+				else {
+					cout << r->data << '\t';
+					pop(treeStack);
+					visited = r; 
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+}
+
+//DUYET NLR KHU DE QUY
+
+void NLRStack(Node* root, Stack& treeStack) {
+	if (root != NULL) {
+		Node* p = root;
+		while (true) {
+			while (p != NULL) {
+				push(treeStack, p);
+				cout << p->data << '\t';
+				p = p->left;
+			}
+			if (!isEmpty(treeStack)) {
+				Node* r = pop(treeStack);
+				if (r->right != NULL) {
+					p = r->right;
+				}
+			}
+			else {
+				break;
+			}
+		}
+	}
+}
+
+// So nguyen to
+bool isNguyenTo(int a) {
+	if (a < 2) {
+		return false;
+	}
+	for (int i = 2; i <= sqrt(a); i++)
+	{
+		if (a % i == 0) {
+			return false;
+		}
+	}
+	return true;
+}
+
+void outputNguyenTo(Node* root) {
+	if (root != NULL)
+	{
+		outputNguyenTo(root->left);
+		if (isNguyenTo(root->data))
+		{
+			cout << root->data << "\t";
+		}
+		outputNguyenTo(root->right);
+	}
+}
+
+
+// Dem node con trai va phai
+int countNodeChild(Node* root) {
+	if (root == NULL) {
+		return 0;
+	}
+	int count = 0;
+	if (root->left != 0 && root->right != NULL) {
+		count++;
+	}
+	count+= countNodeChild(root->left) + countNodeChild(root->right);
+	return count;
+}
+
+void menu() {
+	int baitap;
+	bool check = true, flag=false;
+
+	Node* root;
+	init(root);
+	Stack treeStack;
+	initStack(treeStack);
+	do
+	{
+		cout << "\n==========================BAITAP======================\n\n";
+		cout << "1. Read input file.\n";
+		cout << "2. LNR not recursion.\n";
+		cout << "3. NLR not recursion.\n";
+		cout << "4. LRN not recursion.\n";
+		cout << "5. Count prime.\n";
+		cout << "6. Count node with 2 children.\n";
+		cout << "Your choice(1-6) or enter any to exit: ";
+		cin >> baitap;
+		cout<< "\n=======================================================\n\n";
+		switch (baitap)
+		{
+		case 1:
+			inputFile(root);
+			flag = true;
+			break;
+		case 2:
+			if (flag) {
+				LNRStack(root, treeStack);
+				cout << endl;
+			}
+			else {
+				cout << "Tree is empty. You must do case 1 first!\n";
+			}
+			
+			break;
+		case 3:
+			if (flag) {
+				NLRStack(root, treeStack);
+				cout << endl;
+			}
+			else {
+				cout << "Tree is empty. You must do case 1 first!\n";
+			}
+			break;
+		case 4:
+			if (flag) {
+				LRNStack(root, treeStack);
+				cout << endl;
+			}
+			else {
+				cout << "Tree is empty. You must do case 1 first!\n";
+			}
+			break;
+		case 5:
+			if (flag) {
+				cout << "Node prime in tree:\n";
+				outputNguyenTo(root);
+				cout << endl;
+			}
+			else {
+				cout << "Tree is empty. You must do case 1 first!\n";
+			}
+			break;
+		case 6:
+			if (flag) {
+				cout << "Node with 2 children in tree:\n";
+				cout << countNodeChild(root) << endl;
+			}
+			else {
+				cout << "Tree is empty. You must do case 1 first!\n";
+			}
+			break;
+		default:
+			check = false;
+			break;
+		}
+	} while (check);
+}
+
+
+int main() {
+	menu();
+	return 0;
+}
